@@ -1,7 +1,10 @@
 default: all
 all: openqa-mon
 openqa-mon: cmd/openqa-mon/openqa-mon.go cmd/openqa-mon/terminal.go cmd/openqa-mon/jobs.go cmd/openqa-mon/config.go
-	go build $^
+	go build ./...
+
+test:
+	go test ./...
 
 install: openqa-mon
 	install openqa-mon /usr/local/bin

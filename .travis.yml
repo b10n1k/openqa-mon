@@ -13,3 +13,4 @@ dist:
 
 script:
   - make
+  - make test

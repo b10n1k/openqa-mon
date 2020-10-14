@@ -65,6 +65,16 @@ func (job *Job) stateString() string {
 	}
 }
 
+func (job *Job) cmd(ref Job) bool {
+	if job.ID != ref.ID || job.Name != ref.Name || job.Test != ref.Test || job.AssignedWorkerID != ref.AssignedWorkerID || job.BlockedByID != ref.BlockedByID || job.CloneID != ref.CloneID || job.GroupID != ref.GroupID || job.Settings != ref.Settings || job.Prefix != ref.Prefix || job.Priority != ref.Priority || job.Result != ref.Result || job.State != ref.State {
+		return false
+	}
+	// TODO: Missing Parents
+	// We also omit Link and Remote because they are constructed and thus not suitable for comparison
+
+	return true
+}
+
 // Println prints the current job in a 80 character wide line with optional colors enabled
 func (job *Job) Println(useColors bool, width int) {
 	status := job.State
