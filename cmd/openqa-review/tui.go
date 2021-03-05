@@ -71,6 +71,7 @@ func CreateTUI() TUI {
 /* The model that will be displayed in the TUI*/
 type TUIModel struct {
 	jobs      []gopenqa.Job            // Jobs to be displayed
+	reviewed  []int                    // Jobs marked as reviewed
 	jobGroups map[int]gopenqa.JobGroup // Job Groups
 	mutex     sync.Mutex               // Access mutex to the model
 }
@@ -83,6 +84,21 @@ func (tui *TUIModel) Apply(jobs []gopenqa.Job) {
 
 func (tui *TUIModel) SetJobGroups(grps map[int]gopenqa.JobGroup) {
 	tui.jobGroups = grps
+}
+
+func (model *TUIModel) AddReviewedJob(id int) {
+	model.reviewed = append(model.reviewed, id)
+}
+
+func (model *TUIModel) RemoveReviewedJob(job int) {
+	i := 0
+	for _, id := range model.reviewed {
+		if id != job {
+			model.reviewed[i] = id
+			id++
+		}
+	}
+	model.reviewed = model.reviewed[:i]
 }
 
 func (tui *TUI) SetHide(hide bool) {

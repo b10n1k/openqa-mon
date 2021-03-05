@@ -180,34 +180,43 @@ func parseProgramArgs() error {
 		arg := os.Args[i]
 		if arg == "" {
 			continue
-		} else if arg == "-h" || arg == "--help" {
-			printUsage()
-			os.Exit(0)
-		} else if arg == "-c" || arg == "--config" {
-			if i++; i >= n {
-				return fmt.Errorf("Missing argument: %s", "config file")
+		}
+		// Arguments
+		if arg[0] == '-' {
+			if arg == "-h" || arg == "--help" {
+				printUsage()
+				os.Exit(0)
+			} else if arg == "-c" || arg == "--config" {
+				if i++; i >= n {
+					return fmt.Errorf("Missing argument: %s", "config file")
+				}
+				filename := os.Args[i]
+				if err := cf.LoadToml(filename); err != nil {
+					return fmt.Errorf("In %s: %s", filename, err)
+				}
+			} else if arg == "-r" || arg == "--remote" {
+				if i++; i >= n {
+					return fmt.Errorf("Missing argument: %s", "remote")
+				}
+				cf.Instance = os.Args[i]
+			} else if arg == "-q" || arg == "--rabbit" || arg == "--rabbitmq" {
+				if i++; i >= n {
+					return fmt.Errorf("Missing argument: %s", "RabbitMQ link")
+				}
+				cf.RabbitMQ = os.Args[i]
+			} else if arg == "-i" || arg == "--hide" || arg == "--hide-status" {
+				if i++; i >= n {
+					return fmt.Errorf("Missing argument: %s", "Status to hide")
+				}
+				cf.HideStatus = append(cf.HideStatus, strings.Split(os.Args[i], ",")...)
+			} else {
+				return fmt.Errorf("Illegal argument: %s", arg)
 			}
-			filename := os.Args[i]
-			if err := cf.LoadToml(filename); err != nil {
-				return fmt.Errorf("In %s: %s", filename, err)
-			}
-		} else if arg == "-r" || arg == "--remote" {
-			if i++; i >= n {
-				return fmt.Errorf("Missing argument: %s", "remote")
-			}
-			cf.Instance = os.Args[i]
-		} else if arg == "-q" || arg == "--rabbit" || arg == "--rabbitmq" {
-			if i++; i >= n {
-				return fmt.Errorf("Missing argument: %s", "RabbitMQ link")
-			}
-			cf.RabbitMQ = os.Args[i]
-		} else if arg == "-i" || arg == "--hide" || arg == "--hide-status" {
-			if i++; i >= n {
-				return fmt.Errorf("Missing argument: %s", "Status to hide")
-			}
-			cf.HideStatus = append(cf.HideStatus, strings.Split(os.Args[i], ",")...)
 		} else {
-			return fmt.Errorf("Illegal argument: %s", arg)
+			// Assume it's a config file
+			if err := cf.LoadToml(arg); err != nil {
+				return fmt.Errorf("In %s: %s", arg, err)
+			}
 		}
 	}
 	return nil
